@@ -161,6 +161,17 @@ mkdir -p /etc/alsa/conf.d
 ln -sf /usr/share/alsa/alsa.conf.d/50-pipewire.conf /etc/alsa/conf.d
 ln -sf /usr/share/alsa/alsa.conf.d/99-pipewire-default.conf /etc/alsa/conf.d
 
+
+# Discord install
+
+cd ~/git
+git clone https://github.com/void-linux/void-packages.git
+cd void-packages
+./xbps-src binary-bootstrap
+echo XBPS_ALLOW_RESTRICTED=yes >> etc/conf
+./xbps-src pkg discord
+sudo xbps-install --repository=$PWD/hostdir/binpkgs/nonfree discord
+
 # SSD Setup
 # Check if drives allow TRIM
 
