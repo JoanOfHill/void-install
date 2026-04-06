@@ -152,6 +152,8 @@ sv restart NetworkManager
 
 # Pipewire setup
 
+mkdir -p /etc/xdg/autostart
+ln -sf /usr/share/applications/pipewire.desktop /etc/xdg/autostart/
 mkdir -p /etc/pipewire/pipewire.conf.d
 ln -sf /usr/share/examples/wireplumber/10-wireplumber.conf /etc/pipewire/pipewire.conf.d/
 ln -sf /usr/share/examples/pipewire/20-pipewire-pulse.conf /etc/pipewire/pipewire.conf.d/
