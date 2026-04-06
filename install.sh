@@ -170,7 +170,7 @@ cd void-packages
 ./xbps-src binary-bootstrap
 echo XBPS_ALLOW_RESTRICTED=yes >> etc/conf
 ./xbps-src pkg discord
-sudo xbps-install --repository=$PWD/hostdir/binpkgs/nonfree discord
+doas xbps-install --repository=$PWD/hostdir/binpkgs/nonfree discord
 
 # SSD Setup
 # Check if drives allow TRIM
