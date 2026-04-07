@@ -12,11 +12,12 @@ fdisk -l /dev/nvme0n1
 
 cryptsetup luksFormat --type luks1 /dev/nvme0n1p2
 cryptsetup luksOpen /dev/nvme0n1p2 tyr
+# Enter SSD volume password
 
 # Create logical volume group and logical volumes
 
 vgcreate tyr /dev/mapper/tyr
-lvcreate --name root -L 200G tyr
+lvcreate --name root -L 250G tyr
 lvcreate --name swap -L 32G tyr
 lvcreate --name home -l 100%FREE tyr
 
@@ -50,7 +51,41 @@ xbps-install -Sy -R https://repo-default.voidlinux.org/current -r /mnt base-syst
 
 # Install additional packages
 
-xbps-install -Sy -R https://repo-default.voidlinux.org/current -r /mnt vim nano dbus elogind polkit xorg xorg-fonts xorg-video-drivers xorg-input-drivers dejavu-fonts-ttf terminus-font NetworkManager pipewire alsa-pipewire wireplumber xdg-user-dirs unzip xz 7zip python3-dbus linux6.19 firefox-esr thunderbird deluge dino gajim vlc libaacs android-tools wget curl mumble liferea hexchat gvim git xterm rxvt-unicode xorg-fonts noto-fonts-cjk nerd-fonts-ttf noto-fonts-emoji noto-fonts-ttf nerd-fonts gtk+3 xdg-desktop-portal-gtk xdg-desktop-portal bluez ufw Thunar steam linux-firmware-amd mesa-dri  vulkan-loader mesa-vulkan-radeon mesa-vaapi xf86-video-amdgpu LACT lightdm lightdm-gtk3-greeter xfce4 gnome-themes-standard gnome-keyring network-manager-applet gvfs-afc gvfs-mtp gvfs-smb udisks2 xfce4-pulseaudio-plugin engrampa mousepad opendoas linux-firmware-network libva-utils linux6.19-headers chrony cronie WindowMaker obs rsync lynx rhythmbox libreoffice keepassxc xarchiver wireguard htop nvtop gparted feh helvum tuxguitar picard libgcc-32bit libstdc++-32bit libdrm-32bit libglvnd-32bit mesa-dri-32bit protonmail-bridge v4l2loopback
+PACKAGES=(
+   python3-dbus libva-utils
+   # Utilities
+   opendoas rsync lynx vim nano wget curl unzip xz 7zip git xterm rxvt-unicode android-tools feh autoconf automake pkg-config
+   # System Tools
+   LACT htop nvtop gparted wireguard dmidecode
+   # Accessories
+   gvim Thunar engrampa mousepad keepassxc xarchiver
+   # Filesystem
+   udisks2 gvfs-afc gvfs-mtp gvfs-smb gvfs-gphoto2 gvfs
+   # System
+   linux6.19 linux6.19-headers linux-firmware-network linux-firmware-amd mesa-dri vulkan-loader mesa-vulkan-radeon mesa-vaapi xf86-video-amdgpu
+   # Services
+   dbus elogind polkit bluez ufw NetworkManager chrony cronie
+   # Fonts
+   terminus-font xorg-fonts dejavu-fonts-ttf noto-fonts-ttf noto-fonts-cjk noto-fonts-emoji nerd-fonts nerd-fonts-ttf liberation-fonts-ttf
+   # Audio
+   helvum pipewire alsa-pipewire wireplumber
+   # Internet
+   mumble liferea hexchat firefox-esr thunderbird deluge deluge-gtk dino gajim protonmail-bridge
+   # Office
+   libreoffice gimp
+   # Graphical Environment
+   xorg xorg-video-drivers xorg-input-drivers lightdm lightdm-gtk3-greeter xfce4 xfce4-pulseaudio-plugin gtk+3 xdg-user-dirs xdg-desktop-portal xdg-desktop-portal-gtk network-manager-applet WindowMaker webp-pixbuf-loader libheif-pixbuf-loader
+   # GUI Questionable
+   light-locker gnome-themes-standard
+   # WindowMaker and dockapp specific
+   libX11-devel libXpm-devel libdockapp-devel libiconv-devel lm_sensors libsensors-devel
+   # Multimedia
+   rhythmbox vlc libaacs obs v4l2loopback tuxguitar picard
+   # Steam
+   steam libgcc-32bit libstdc++-32bit libdrm-32bit libglvnd-32bit mesa-dri-32bit
+)
+
+xbps-install -Sy -R https://repo-default.voidlinux.org/current -r /mnt "${PACKAGES[@]}"
 
 # Generate fstab
 
@@ -63,6 +98,7 @@ bash
 chown root:root /
 chmod 755 /
 passwd root
+# Type root password
 
 # Set hostname, timezone and system Locale
 
@@ -73,17 +109,17 @@ echo "en_US.UTF-8 UTF-8" >> /etc/default/libc-locales
 xbps-reconfigure -f glibc-locales
 
 # GRUB Config
-# Copy UUID of LUKS container
 
-blkid -o value -s UUID /dev/nvme0n1p2
+## Copy UUID of LUKS container
+#blkid -o value -s UUID /dev/nvme0n1p2
+## Edit /etc/default/grub and add the following
+#GRUB_ENABLE_CRYPTODISK=y
+## Append the following to  GRUB_CMDLINE_LINUX_DEFAULT= entry in /etc/default/grub and append it with the following
+#rd.lvm.vg=tyr rd.luks.uuid=<UUID> rd.luks.allow-discards
 
-# Edit /etc/default/grub and add the following
-
-GRUB_ENABLE_CRYPTODISK=y
-
-# Append the following to  GRUB_CMDLINE_LINUX_DEFAULT= entry in /etc/default/grub and append it with the following
-
-rd.lvm.vg=tyr rd.luks.uuid=<UUID>
+SSD_LUKS_UUID=$(blkid -o value -s UUID /dev/nvme0n1p2)
+echo "GRUB_ENABLE_CRYPTODISK=y" >> /etc/default/grub
+sed -i "s/\(GRUB_CMDLINE_LINUX_DEFAULT=\"[^\"]*\)/\1 rd.lvm.vg=tyr rd.luks.uuid=${SSD_LUKS_UUID} rd.luks.allow-discards/" /etc/default/grub
 
 # LUKS Key setup
 
@@ -92,18 +128,23 @@ cryptsetup luksAddKey /dev/nvme0n1p2 /boot/volume.key
 chmod 000 /boot/volume.key
 chmod -R g-rwx,o-rwx /boot
 
-# Edit /etc/crypttab and append it with
+## Edit /etc/crypttab and append it with
+##tyr	/dev/nvme0n1p2	/boot/volume.key	luks,discard
+#tyr	UUID=<UUID>	/boot/volume.key	luks,discard
 
-#tyr	/dev/nvme0n1p2	/boot/volume.key	luks
-tyr	UUID=<UUID>	/boot/volume.key	luks
+# Inject UUID into crypttab
+echo "tyr    UUID=${SSD_LUKS_UUID}    /boot/volume.key    luks,discard" >> /etc/crypttab
+
+# Enable discard in LVM
+sudo sed -i 's/^.*issue_discards =.*/\tissue_discards = 1/' /etc/lvm/lvm.conf
+
+## Add keyfile
+#touch /etc/dracut.conf.d/10-crypt.conf
+## Add the following to 10-crypt.conf
+#install_items+=" /boot/volume.key /etc/crypttab "
 
 # Add keyfile
-
-touch /etc/dracut.conf.d/10-crypt.conf
-
-# Add the following to 10-crypt.conf
-
-install_items+=" /boot/volume.key /etc/crypttab "
+echo 'install_items+=" /boot/volume.key /etc/crypttab "' > /etc/dracut.conf.d/10-crypt.conf
 
 # Install bootloader and generate initramfs
 
@@ -111,7 +152,15 @@ install_items+=" /boot/volume.key /etc/crypttab "
 grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id="Void"
 xbps-reconfigure -fa
 
-# Enable services (dbus, elogind, NetworkManager, lightdm, polkitd, ufw, chronyd, acpid)
+# Enable weekly TRIM cron job
+mkdir -p /etc/cron.weekly/
+cat << 'EOF' > /etc/cron.weekly/fstrim
+#!/bin/sh
+fstrim /
+EOF
+chmod u+x /etc/cron.weekly/fstrim
+
+# Enable services
 
 ln -s /etc/sv/dbus /etc/runit/runsvdir/default/
 ln -s /etc/sv/sshd /etc/runit/runsvdir/default/
@@ -127,6 +176,7 @@ ln -s /etc/sv/bluetoothd /etc/runit/runsvdir/default/
 
 useradd -m -G wheel,audio,video,cdrom,input,lp,network,sudo,tty,floppy,dialout,storage,optical -s /bin/bash iryna
 passwd iryna
+# Type user password
 
 # Configure doas
 
@@ -161,17 +211,6 @@ mkdir -p /etc/alsa/conf.d
 ln -sf /usr/share/alsa/alsa.conf.d/50-pipewire.conf /etc/alsa/conf.d
 ln -sf /usr/share/alsa/alsa.conf.d/99-pipewire-default.conf /etc/alsa/conf.d
 
-
-# Discord install
-
-cd ~/git
-git clone https://github.com/void-linux/void-packages.git
-cd void-packages
-./xbps-src binary-bootstrap
-echo XBPS_ALLOW_RESTRICTED=yes >> etc/conf
-./xbps-src pkg discord
-doas xbps-install --repository=$PWD/hostdir/binpkgs/nonfree discord
-
 # SSD Setup
 # Check if drives allow TRIM
 
@@ -183,20 +222,40 @@ lsblk --discard
 # Generate keyfile and add to HDD
 mkdir /mnt/hd1
 cryptsetup luksOpen /dev/sdb1
+# Enter HDD volume password
 mount /dev/mapper/hd1 /mnt/hd1
 mkdir -p /etc/luks
 dd bs=1 count=64 if=/dev/urandom of=/etc/luks/hd1.key
 chmod 400 /etc/luks/hd1.key
 cryptsetup luksAddKey /dev/sdb1 /etc/luks/hd1.key
 
-# Determine HDD UUID
+# Add to crypttab and fstab
+HDD_UUID=$(blkid -s UUID -o value /dev/sdb1)
+echo "hd1    UUID=${HDD_UUID}    /etc/luks/hd1.key    luks" >> /etc/crypttab
+echo "/dev/mapper/hd1    /mnt/hd1    ext4    defaults    0    2" >> /etc/fstab
 
-blkid -s UUID -o value /dev/sdb1
+## Determine HDD UUID
+#blkid -s UUID -o value /dev/sdb1
+## Append /etc/crypttab with the following:
+#hd1	UUID=<UUID>	/etc/luks/hd1.key	luks
+## Append /etc/fstab with the following:
+#/dev/mapper/hd1	/mnt/hd1	ext4	defaults	0	2
 
-# Append /etc/crypttab with the following:
+# Discord install
 
-hd1	UUID=<UUID>	/etc/luks/hd1.key	luks
+cd ~/git
+git clone https://github.com/void-linux/void-packages.git
+cd void-packages
+./xbps-src binary-bootstrap
+echo XBPS_ALLOW_RESTRICTED=yes >> etc/conf
+./xbps-src pkg discord
+doas xbps-install --repository=$PWD/hostdir/binpkgs/nonfree discord
 
-# Append /etc/fstab with the following:
+# WindowMaker config
 
-/dev/mapper/hd1	/mnt/hd1	ext4	defaults	0	2
+# Clone dockapp repo
+cd ~/git
+git clone https://github.com/window-maker/dockapps.git
+
+# Edit ~/GNUstep/Library/WindowMaker/autostart and add
+light-locker &
