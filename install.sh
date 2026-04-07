@@ -114,6 +114,9 @@ echo "LANG=en_US.UTF-8" > /etc/locale.conf
 echo "en_US.UTF-8 UTF-8" >> /etc/default/libc-locales
 xbps-reconfigure -f glibc-locales
 
+# Check if drives allow TRIM, if not, remove issue_discards=1 from lvm.conf and rd.luks.allow-discards from grub as well as discard from crypttab
+# lsblk --discard
+
 # GRUB Config
 
 ## Copy UUID of LUKS container
@@ -216,13 +219,6 @@ ln -sf /usr/share/examples/pipewire/20-pipewire-pulse.conf /etc/pipewire/pipewir
 mkdir -p /etc/alsa/conf.d
 ln -sf /usr/share/alsa/alsa.conf.d/50-pipewire.conf /etc/alsa/conf.d
 ln -sf /usr/share/alsa/alsa.conf.d/99-pipewire-default.conf /etc/alsa/conf.d
-
-# SSD Setup
-# Check if drives allow TRIM
-
-lsblk --discard
-
-# If yes, go to https://docs.voidlinux.org/config/ssd.html for setup info
 
 # Add pre-existing 20TB HDD to filesystem (optional)
 # Generate keyfile and add to HDD
