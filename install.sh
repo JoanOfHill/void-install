@@ -1,5 +1,9 @@
 # "Easy" Void Linux bootstrap and system install guide
 
+HOSTNAME="tyr"
+USERNAME="user"
+VGNAME="tyr"
+
 # Boot into a Live USB
 
 bash
@@ -16,23 +20,23 @@ cryptsetup luksOpen /dev/nvme0n1p2 tyr
 
 # Create logical volume group and logical volumes
 
-vgcreate tyr /dev/mapper/tyr
-lvcreate --name root -L 250G tyr
-lvcreate --name swap -L 32G tyr
-lvcreate --name home -l 100%FREE tyr
+vgcreate ${VGNAME} /dev/mapper/${VGNAME}
+lvcreate --name root -L 250G ${VGNAME}
+lvcreate --name swap -L 32G ${VGNAME}
+lvcreate --name home -l 100%FREE ${VGNAME}
 
 # Create file systems
 
-mkfs.ext4 -L root /dev/tyr/root
-mkfs.ext4 -L home /dev/tyr/home
-mkswap /dev/tyr/swap
-swapon /dev/tyr/swap
+mkfs.ext4 -L root /dev/${VGNAME}/root
+mkfs.ext4 -L home /dev/${VGNAME}/home
+mkswap /dev/${VGNAME}/swap
+swapon /dev/${VGNAME}/swap
 
 # Setup chroot
 
-mount /dev/tyr/root /mnt
+mount /dev/${VGNAME}/root /mnt
 mkdir -p /mnt/home
-mount /dev/tyr/home /mnt/home
+mount /dev/${VGNAME}/home /mnt/home
 
 # Mount EFI system partition
 
@@ -104,7 +108,7 @@ passwd root
 
 # Set hostname, timezone and system Locale
 
-echo tyr > /etc/hostname
+echo ${HOSTNAME} > /etc/hostname
 ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
 echo "LANG=en_US.UTF-8" > /etc/locale.conf
 echo "en_US.UTF-8 UTF-8" >> /etc/default/libc-locales
@@ -121,7 +125,7 @@ xbps-reconfigure -f glibc-locales
 
 SSD_LUKS_UUID=$(blkid -o value -s UUID /dev/nvme0n1p2)
 echo "GRUB_ENABLE_CRYPTODISK=y" >> /etc/default/grub
-sed -i "s/\(GRUB_CMDLINE_LINUX_DEFAULT=\"[^\"]*\)/\1 rd.lvm.vg=tyr rd.luks.uuid=${SSD_LUKS_UUID} rd.luks.allow-discards/" /etc/default/grub
+sed -i "s/\(GRUB_CMDLINE_LINUX_DEFAULT=\"[^\"]*\)/\1 rd.lvm.vg=${VGNAME} rd.luks.uuid=${SSD_LUKS_UUID} rd.luks.allow-discards/" /etc/default/grub
 
 # LUKS Key setup
 
@@ -135,7 +139,7 @@ chmod -R g-rwx,o-rwx /boot
 #tyr	UUID=<UUID>	/boot/volume.key	luks,discard
 
 # Inject UUID into crypttab
-echo "tyr    UUID=${SSD_LUKS_UUID}    /boot/volume.key    luks,discard" >> /etc/crypttab
+echo "${VGNAME}    UUID=${SSD_LUKS_UUID}    /boot/volume.key    luks,discard" >> /etc/crypttab
 
 # Enable discard in LVM
 sudo sed -i 's/^.*issue_discards =.*/\tissue_discards = 1/' /etc/lvm/lvm.conf
@@ -176,8 +180,8 @@ ln -s /etc/sv/bluetoothd /etc/runit/runsvdir/default/
 
 # Create standard user and set password
 
-useradd -m -G wheel,audio,video,cdrom,input,lp,network,sudo,tty,floppy,dialout,storage,optical -s /bin/bash iryna
-passwd iryna
+useradd -m -G wheel,audio,video,cdrom,input,lp,network,sudo,tty,floppy,dialout,storage,optical -s /bin/bash ${USERNAME}
+passwd ${USERNAME}
 # Type user password
 
 # Configure doas
