@@ -60,7 +60,7 @@ PACKAGES=(
    # Accessories
    gvim Thunar engrampa mousepad keepassxc xarchiver
    # Filesystem
-   udisks2 gvfs-afc gvfs-mtp gvfs-smb gvfs-gphoto2 gvfs
+   udisks2 gvfs gvfs-afc gvfs-mtp gvfs-smb gvfs-gphoto2
    # System
    linux6.19 linux6.19-headers linux-firmware-network linux-firmware-amd mesa-dri vulkan-loader mesa-vulkan-radeon mesa-vaapi xf86-video-amdgpu
    # Services
@@ -74,11 +74,13 @@ PACKAGES=(
    # Office
    libreoffice gimp
    # Graphical Environment
-   xorg xorg-video-drivers xorg-input-drivers lightdm lightdm-gtk3-greeter xfce4 xfce4-pulseaudio-plugin gtk+3 xdg-user-dirs xdg-desktop-portal xdg-desktop-portal-gtk network-manager-applet WindowMaker webp-pixbuf-loader libheif-pixbuf-loader
+   xorg xorg-video-drivers xorg-input-drivers lightdm lightdm-gtk3-greeter gtk+3 xdg-user-dirs xdg-desktop-portal xdg-desktop-portal-gtk network-manager-applet webp-pixbuf-loader libheif-pixbuf-loader
    # GUI Questionable
    light-locker gnome-themes-standard
+   # Xfce4 specific
+   xfce4 xfce4-pulseaudio-plugin
    # WindowMaker and dockapp specific
-   libX11-devel libXpm-devel libdockapp-devel libiconv-devel lm_sensors libsensors-devel
+   WindowMaker wmsystemtray libX11-devel libXpm-devel libdockapp-devel libiconv-devel lm_sensors libsensors-devel
    # Multimedia
    rhythmbox vlc libaacs obs v4l2loopback tuxguitar picard
    # Steam
