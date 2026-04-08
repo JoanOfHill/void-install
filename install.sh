@@ -250,7 +250,7 @@ echo "/dev/mapper/hd1    /mnt/hd1    ext4    defaults    0    2" >> /etc/fstab
 
 echo "complete -cf doas"
 
-# Discord install
+# Install restricted packages (Discord, Signal Desktop)
 
 cd ~/git
 git clone https://github.com/void-linux/void-packages.git
