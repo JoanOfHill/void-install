@@ -58,7 +58,7 @@ xbps-install -Sy -R https://repo-default.voidlinux.org/current -r /mnt base-syst
 PACKAGES=(
    python3-dbus libva-utils
    # Utilities
-   opendoas rsync lynx vim nano wget curl unzip xz 7zip git xterm rxvt-unicode android-tools feh autoconf automake pkg-config
+   opendoas rsync lynx vim nano wget curl unzip xz 7zip git xterm rxvt-unicode android-tools feh autoconf automake pkg-config nfs-utils
    # System Tools
    LACT htop nvtop gparted wireguard dmidecode
    # Accessories
