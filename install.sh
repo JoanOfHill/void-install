@@ -243,6 +243,10 @@ echo "/dev/mapper/hd1    /mnt/hd1    ext4    defaults    0    2" >> /etc/fstab
 ## Append /etc/fstab with the following:
 #/dev/mapper/hd1	/mnt/hd1	ext4	defaults	0	2
 
+# Doas autocomplete
+
+echo "complete -cf doas"
+
 # Discord install
 
 cd ~/git
