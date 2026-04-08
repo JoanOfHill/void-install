@@ -265,3 +265,4 @@ git clone https://github.com/window-maker/dockapps.git
 
 # Edit ~/GNUstep/Library/WindowMaker/autostart and add
 light-locker &
+pipewire &
