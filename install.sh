@@ -78,7 +78,7 @@ PACKAGES=(
    # Office
    libreoffice gimp
    # Graphical Environment
-   xorg xorg-video-drivers xorg-input-drivers lightdm lightdm-gtk3-greeter gtk+3 xdg-user-dirs xdg-desktop-portal xdg-desktop-portal-gtk network-manager-applet webp-pixbuf-loader libheif-pixbuf-loader
+   xorg xorg-video-drivers xorg-input-drivers lightdm lightdm-gtk3-greeter gtk+3 xdg-user-dirs xdg-desktop-portal xdg-desktop-portal-gtk network-manager-applet webp-pixbuf-loader libheif-pixbuf-loader qt6-base
    # GUI Questionable
    light-locker gnome-themes-standard
    # Xfce4 specific
