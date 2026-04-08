@@ -60,7 +60,7 @@ PACKAGES=(
    # Utilities
    opendoas rsync lynx vim nano wget curl unzip xz 7zip git xterm rxvt-unicode android-tools feh autoconf automake pkg-config nfs-utils
    # System Tools
-   LACT htop nvtop gparted wireguard dmidecode
+   LACT htop nvtop gparted wireguard dmidecode xtools
    # Accessories
    gvim Thunar engrampa mousepad keepassxc xarchiver
    # Filesystem
@@ -68,7 +68,7 @@ PACKAGES=(
    # System
    linux6.19 linux6.19-headers linux-firmware-network linux-firmware-amd mesa-dri vulkan-loader mesa-vulkan-radeon mesa-vaapi xf86-video-amdgpu
    # Services
-   dbus elogind polkit bluez ufw NetworkManager chrony cronie
+   dbus elogind polkit bluez ufw NetworkManager chrony cronie cups socklog-void
    # Fonts
    terminus-font xorg-fonts dejavu-fonts-ttf noto-fonts-ttf noto-fonts-cjk noto-fonts-emoji nerd-fonts nerd-fonts-ttf liberation-fonts-ttf
    # Audio
@@ -182,6 +182,7 @@ ln -s /etc/sv/cronie /etc/runit/runsvdir/default/
 ln -s /etc/sv/bluetoothd /etc/runit/runsvdir/default/
 ln -s /etc/sv/socklog-unix /etc/runit/runsvdir/default/
 ln -s /etc/sv/nanoklogd /etc/runit/runsvdir/default/
+ln -s /etc/sv/cupsd /etc/runit/runsvdir/default/
 
 # Create standard user and set password
 
@@ -257,6 +258,7 @@ cd void-packages
 ./xbps-src binary-bootstrap
 echo XBPS_ALLOW_RESTRICTED=yes >> etc/conf
 ./xbps-src pkg discord
+./xbps-src pkg Signal-Desktop
 doas xbps-install --repository=$PWD/hostdir/binpkgs/nonfree discord
 
 # WindowMaker config
