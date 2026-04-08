@@ -180,6 +180,8 @@ ln -s /etc/sv/ufw /etc/runit/runsvdir/default/
 ln -s /etc/sv/chronyd /etc/runit/runsvdir/default/
 ln -s /etc/sv/cronie /etc/runit/runsvdir/default/
 ln -s /etc/sv/bluetoothd /etc/runit/runsvdir/default/
+ln -s /etc/sv/socklog-unix /etc/runit/runsvdir/default/
+ln -s /etc/sv/nanoklogd /etc/runit/runsvdir/default/
 
 # Create standard user and set password
 
